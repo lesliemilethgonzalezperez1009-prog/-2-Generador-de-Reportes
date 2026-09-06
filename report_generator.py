@@ -1,21 +1,28 @@
 import csv
-
+from fpdf import FPDF
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.styles import Alignment
+# BASE
 total_unidades= 0
 total_ventas = 0
-
 book = Workbook()
 sheet = book.active
 fuente = Font(name='Arial', size=12, bold=True)
+pdf = FPDF()
+pdf.add_page()
+pdf.set_font('Arial', size=12)
 
+## ENCABEZADO
 sheet.merge_cells('A1:D1')
 sheet['A1'] = 'ANALISIS DE DATOS CSV'
 sheet['A1'].font = fuente
-
-
-with open('ventas.csv', 'r') as cvs_file:
+pdf.cell(100, 10, txt="ANALISIS DE DATOS CSV", ln=True)
+pdf.cell(40, 10, txt="PRODUCTOS", border=1, ln=False)
+pdf.cell(40, 10, txt="CATEGORIA", border=1, ln=False)
+pdf.cell(40, 10, txt="UNIDADES", border=1, ln=False)
+pdf.cell(40, 10, txt="PRECIO UNITARIO", border=1, ln=True)
+with open('ventas.csv', 'r') as cvs_file:   
     cvs_reader = csv.reader(cvs_file)
     next(cvs_reader)
     sheet.append(['Producto', 'Categoria', 'Unidades', 'Precio unitario'])
@@ -26,10 +33,18 @@ with open('ventas.csv', 'r') as cvs_file:
         total_unidades+= int(line[2])
         ventas  = int(line[3]) * float(line[2])
         total_ventas = total_ventas + ventas
-    sheet.append(['Total', '', total_unidades, total_ventas])
-    for cell in sheet[2]:
+        pdf.cell(40, 10, txt=f"{line[0]}", border=1, ln= False)
+        pdf.cell(40, 10, txt=f"{line[1]}", border=1, ln=False)
+        pdf.cell(40, 10, txt=f"{line[2]}", border=1, ln=False)
+        pdf.cell(40, 10, txt=f"{line[3]}", border=1, ln=True)
+    pdf.cell(40, 10, txt= "total unidades:", border=1, ln= False)
+    pdf.cell(40, 10, txt= f" ", border=1, ln= False)
+    pdf.cell(40, 10, txt= f"{total_unidades}", border=1, ln= False)
+    pdf.cell(40, 10, txt= f"${int(total_ventas)}", border=1, ln= True)
+    for cell in sheet[2]:   
         cell.font = fuente
         cell.alignment = Alignment(horizontal='left')
+
     Ultima_fila = sheet.max_row
     for cell in sheet[Ultima_fila]:
         cell.font = fuente
@@ -39,4 +54,5 @@ with open('ventas.csv', 'r') as cvs_file:
         sheet.column_dimensions[columna].width = 20 
         
 
-book.save('Reporte.xlsx')
+## book.save('Reporte.xlsx')   
+pdf.output('Reporte.pdf')
