@@ -41,6 +41,8 @@ with open('ventas.csv', 'r') as cvs_file:
     pdf.cell(40, 10, txt= f" ", border=1, ln= False)
     pdf.cell(40, 10, txt= f"{total_unidades}", border=1, ln= False)
     pdf.cell(40, 10, txt= f"${int(total_ventas)}", border=1, ln= True)
+    
+    sheet.append(['Total', '', total_unidades, total_ventas])
     for cell in sheet[2]:   
         cell.font = fuente
         cell.alignment = Alignment(horizontal='left')
@@ -54,5 +56,5 @@ with open('ventas.csv', 'r') as cvs_file:
         sheet.column_dimensions[columna].width = 20 
         
 
-## book.save('Reporte.xlsx')   
+book.save('Reporte.xlsx')   
 pdf.output('Reporte.pdf')
